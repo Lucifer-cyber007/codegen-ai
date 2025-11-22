@@ -267,14 +267,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📧 Contact
 
-- **Author**: Your Name
-- **Email**: your.email@example.com
-- **GitHub**: [@yourusername](https://github.com/yourusername)
-- **LinkedIn**: [Your Profile](https://linkedin.com/in/yourprofile)
+- **Author**: Aditya Sharma
+- **Email**: adityapa2004@gmail.com
 
-## ⭐ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/codegen-ai&type=Date)](https://star-history.com/#yourusername/codegen-ai&Date)
 
 ---
 
