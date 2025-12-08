@@ -18,12 +18,16 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
     
-    # Model Configuration - ADD THESE
+    # Model Configuration
     MODEL_PATH: str = os.getenv("MODEL_PATH", "./models/Luffy_code_assistant")
     MODEL_NAME: str = os.getenv("MODEL_NAME", "google/gemma-2b")
     MAX_LENGTH: int = int(os.getenv("MAX_LENGTH", "2048"))
     TEMPERATURE: float = float(os.getenv("TEMPERATURE", "0.7"))
     TOP_P: float = float(os.getenv("TOP_P", "0.9"))
+    
+    # ✅ MongoDB Configuration (ADD THESE LINES!)
+    MONGODB_URL: str = os.getenv("MONGODB_URL", "")
+    DATABASE_NAME: str = os.getenv("DATABASE_NAME", "codegen_ai")
     
     # CORS
     BACKEND_CORS_ORIGINS: List[str] = [

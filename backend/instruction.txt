@@ -1,0 +1,25 @@
+# Navigate to backend
+cd C:\Users\psaru\OneDrive\Desktop\codegen-ai\backend
+
+# Create virtual environment (if not exists)
+python -m venv venv
+
+# Activate it
+.\venv\Scripts\Activate.ps1
+
+# Install all dependencies
+pip install -r requirements.txt
+
+# Install additional packages
+pip install safetensors
+pip install --upgrade transformers
+
+# Run the backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+## How to Tell if Virtual Environment is Active
+
+When activated, you'll see `(venv)` at the beginning of your command line:
+```
+(venv) C:\Users\psaru\OneDrive\Desktop\codegen-ai\backend>
