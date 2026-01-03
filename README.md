@@ -23,14 +23,110 @@
 - ⚡ **Fast Performance** - Optimized model inference
 - 📚 **Multiple Languages** - Python, JavaScript, and more
 
+## 🔄 n8n Workflow Integration
+
+This project includes a powerful **n8n workflow automation** system that provides intelligent code testing and fixing capabilities.
+
+### Workflow Features
+
+- 🔧 **3-Tier Auto-Fix System**
+  - **Tier 1**: Ruff auto-fix (syntax, imports, style)
+  - **Tier 2**: Template-based logic fixes (common patterns)
+  - **Tier 3**: Smart analysis (common mistakes)
+  - **Tier 4**: AI-powered fixes using Luffy (Gemma 2B)
+
+- 💾 **Automatic Solution Storage** - Successful solutions saved to MongoDB
+- 📊 **Failure Logging** - Failed attempts logged for analysis
+- ⚡ **Fast Processing** - FREE tools handle ~95% of fixes without AI
+- 🤖 **AI Fallback** - Luffy AI fixes complex issues when needed
+
+### n8n API Endpoints
+
+The backend exposes three webhook endpoints for n8n integration (no authentication required):
+
+#### 1. Fix Code with AI
+```
+POST /api/code/fix_code
+```
+**Request:**
+```json
+{
+  "prompt": "Write a function to multiply three numbers",
+  "code": "def multiply(a, b, c):\n    return a * b",
+  "error": "Test failed: Expected 24, got 6"
+}
+```
+**Response:**
+```json
+{
+  "fixed_code": "def multiply(a, b, c):\n    return a * b * c",
+  "success": true,
+  "message": "Fixed by Luffy AI"
+}
+```
+
+#### 2. Store Solution
+```
+POST /api/code/store_solution
+```
+**Request:**
+```json
+{
+  "problem_id": "multiply_3_numbers",
+  "prompt": "Multiply three numbers",
+  "code": "def multiply(a, b, c):\n    return a * b * c",
+  "status": "passed",
+  "fix_method": "ai"
+}
+```
+
+#### 3. Log Failure
+```
+POST /api/code/log_failure
+```
+**Request:**
+```json
+{
+  "problem_id": "complex_algorithm",
+  "prompt": "Solve complex problem",
+  "error": "Multiple test failures",
+  "attempts": 4
+}
+```
+
+### Test Runner Service
+
+A separate FastAPI service (`test_runner.py`) runs on **port 9000** and provides:
+
+- **Automated Testing** - Run unit tests on generated code
+- **FREE Auto-Fix Tools** - Ruff, Pyflakes, template-based fixes
+- **Smart Analysis** - Pattern-based error detection and fixing
+
+**Endpoint:**
+```
+POST http://localhost:9000/run_tests
+```
+
 ## 🏗️ Architecture
 
 ```
-┌─────────────┐      ┌─────────────┐      ┌─────────────┐
-│   React     │─────▶│   FastAPI   │─────▶│  Gemma 2B   │
-│   Frontend  │      │   Backend   │      │   Model     │
-└─────────────┘      └─────────────┘      └─────────────┘
-     (Port 3000)          (Port 8000)         (3.03B params)
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│   n8n       │─────▶│ Test Runner │─────▶│   FastAPI   │─────▶│  Gemma 2B   │
+│  Workflow   │      │  (Port 9000)│      │   Backend   │      │   Model     │
+└─────────────┘      └─────────────┘      │  (Port 8000)│      └─────────────┘
+                            │              └─────────────┘         (3.03B)
+                            │                     │
+                            ▼                     ▼
+                     ┌─────────────┐      ┌─────────────┐
+                     │  FREE Tools │      │   MongoDB   │
+                     │ Ruff/Pyflakes│     │  Solutions  │
+                     └─────────────┘      └─────────────┘
+
+┌─────────────┐      ┌─────────────┐
+│   React     │─────▶│   FastAPI   │
+│   Frontend  │      │   Backend   │
+└─────────────┘      └─────────────┘
+     (Port 3000)          (Port 8000)
 ```
 
 ## 🚀 Quick Start
@@ -89,10 +185,41 @@ REACT_APP_API_URL=http://localhost:8000
 npm start
 ```
 
-### 4. Access the Application
+### 4. Setup n8n Workflow (Optional)
+
+The n8n workflow integration provides automated code testing and fixing.
+
+**Install n8n:**
+```bash
+npm install -g n8n
+```
+
+**Start Test Runner Service:**
+```bash
+cd backend
+python test_runner.py
+# Runs on http://localhost:9000
+```
+
+**Configure n8n Webhooks:**
+- Test Runner: `http://localhost:9000/run_tests`
+- AI Fix: `http://localhost:8000/api/code/fix_code`
+- Store Solution: `http://localhost:8000/api/code/store_solution`
+- Log Failure: `http://localhost:8000/api/code/log_failure`
+
+**MongoDB Setup (for solution storage):**
+```bash
+# Install MongoDB or use MongoDB Atlas
+# Add to backend/.env:
+MONGODB_URL=mongodb://localhost:27017/codegen
+```
+
+### 5. Access the Application
 
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000/docs
+- **Test Runner**: http://localhost:9000/docs
+- **n8n**: http://localhost:5678 (if installed)
 
 ## 📦 Model Setup
 
@@ -142,6 +269,13 @@ jupyter notebook gemma_fine_tune.ipynb
 - **Transformers** - Hugging Face models
 - **PEFT** - LoRA fine-tuning
 - **JWT** - Authentication
+- **MongoDB** - Solution and failure storage
+
+### Automation & Testing
+- **n8n** - Workflow automation
+- **Test Runner** - FastAPI service for automated testing
+- **Ruff** - Fast Python linter and auto-fixer
+- **Pyflakes** - Logic error detection
 
 ### Model
 - **Gemma 2B** - Base model (Google)
@@ -225,10 +359,15 @@ codegen-ai/
 ├── backend/                  # FastAPI backend
 │   ├── app/
 │   │   ├── routes/          # API endpoints
+│   │   │   └── code_generation.py  # n8n integration endpoints
 │   │   ├── services/        # Business logic
+│   │   │   ├── database.py  # MongoDB connection
+│   │   │   └── gemma_service.py  # AI model service
 │   │   ├── models/          # Data models
 │   │   └── utils/           # Helper functions
 │   ├── models/              # AI models
+│   │   └── Luffy_code_assistant/  # Fine-tuned Gemma 2B
+│   ├── test_runner.py       # Test execution service (port 9000)
 │   └── requirements.txt
 ├── notebooks/               # Jupyter notebooks
 │   ├── gemma_fine_tune.ipynb
@@ -253,6 +392,10 @@ See [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for solutions.
 - [ ] Docker containerization
 - [ ] Cloud deployment guides
 - [ ] VS Code extension
+- [x] n8n workflow integration
+- [ ] n8n workflow templates library
+- [ ] Enhanced AI fix patterns
+- [ ] Real-time collaboration features
 
 ## 📄 License
 
